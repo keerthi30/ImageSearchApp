@@ -21,15 +21,35 @@ class FlickrImageViewModel(private val flickrImageRepository: FlickrImageReposit
     var selectedFlickrImage: FlickrImage? = null
     private val _flickrImagesListLiveData = MutableLiveData<FlickrViewState>(FlickrViewState.IdleState)
     val flickrImagesListLiveData: LiveData<FlickrViewState> = _flickrImagesListLiveData
+    val searchTagLiveData = flickrImageRepository.getSearchTagsLiveData()
 
     fun getImages(tag:String) {
-        _flickrImagesListLiveData.postValue(FlickrViewState.IdleState)
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _flickrImagesListLiveData.postValue(FlickrViewState.FlickrImagesList(flickrImageRepository.getImagesByTag(tag = tag).flickrImages))
-            } catch (e:Exception) {
-                _flickrImagesListLiveData.postValue(FlickrViewState.ErrorState(e.localizedMessage ?: ""))
+        if(tag.isEmpty()) {
+            _flickrImagesListLiveData.postValue(FlickrViewState.IdleState)
+        } else {
+            _flickrImagesListLiveData.postValue(FlickrViewState.LoadingState)
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    saveRecentSearchTag(tag)
+                    _flickrImagesListLiveData.postValue(
+                        FlickrViewState.FlickrImagesList(
+                            flickrImageRepository.getImagesByTag(tag = tag).flickrImages
+                        )
+                    )
+                } catch (e: Exception) {
+                    _flickrImagesListLiveData.postValue(
+                        FlickrViewState.ErrorState(
+                            e.localizedMessage ?: ""
+                        )
+                    )
+                }
             }
+        }
+    }
+
+    private fun saveRecentSearchTag(tag: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            flickrImageRepository.saveSearchTag(tag = tag)
         }
     }
 }

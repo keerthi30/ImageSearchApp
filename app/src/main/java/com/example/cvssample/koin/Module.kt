@@ -1,17 +1,20 @@
 package com.example.cvssample.koin
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.cvssample.data.repository.FlickrApi
 import com.example.cvssample.data.repository.FlickrImageRepository
+import com.example.cvssample.data.room.FlickrDao
 import com.example.cvssample.data.room.FlickrDatabase
 import com.example.cvssample.viewmodel.FlickrImageViewModel
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -20,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val repositoryModule = module {
     single {
-        FlickrImageRepository(get())
+        FlickrImageRepository(get(), get())
     }
 }
 
@@ -64,14 +67,16 @@ val retrofitModule = module {
 }
 
 val dataBaseModule = module {
-    fun provideRoomDataBase(context: Context): FlickrDatabase {
-       return Room.databaseBuilder(
-            context,
-            FlickrDatabase::class.java, "search-db"
-        ).build()
+    fun provideDatabase(application: Application): FlickrDatabase {
+        return Room.databaseBuilder(application, FlickrDatabase::class.java, "countries")
+            .build()
     }
 
-    single {
-        provideRoomDataBase(androidContext())
+    fun provideFlickrDao(database: FlickrDatabase): FlickrDao {
+        return  database.flickrDao()
     }
+
+    single { provideDatabase(androidApplication()) }
+    single { provideFlickrDao(get()) }
+
 }

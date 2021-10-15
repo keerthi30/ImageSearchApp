@@ -4,4 +4,6 @@
     <string name="default_error_message">Something went wrong, please try again later.</string>
     <string name="close">Close</string>
     <string name="hint_search_image">Enter image name to search</string>
+    <string name="message_search_image">You have no recent searches. Enter a search term above.</string>
+    <string name="recent_search">Recent Searches</string>
 </resources>

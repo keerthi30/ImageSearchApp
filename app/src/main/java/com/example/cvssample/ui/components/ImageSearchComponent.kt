@@ -23,9 +23,9 @@ import com.example.cvssample.ui.theme.defaultTextColor
 
 @ExperimentalComposeUiApi
 @Composable
-fun ImageSearchScreen(placeHolderText:String,
-                      leadingIcon: @Composable () -> Unit = { SearchImageComponent() },
-                      onDoneClicked: (String) -> Unit
+fun ImageSearchComponent(placeHolderText:String,
+                         leadingIcon: @Composable () -> Unit = { SearchImageComponent() },
+                         onDoneClicked: (String) -> Unit
 ) {
     val textState = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
